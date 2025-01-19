@@ -8,7 +8,13 @@ import { toast } from "sonner";
 import { apiClient } from "@/lib/api-client";
 import { LOGIN_ROUTE, SIGN_UP_ROUTE } from "@/utils/constants";
 import { useNavigate } from "react-router-dom";
+import {
+  createUserState,
+  useAuthZustand,
+  User,
+} from "@/store/slices/authSlice";
 const Auth = () => {
+  const setUser = useAuthZustand((state: createUserState) => state.setUser);
   const nav = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setpassword] = useState("");
@@ -58,6 +64,7 @@ const Auth = () => {
       } else {
         nav("/profile");
       }
+      setUser(res.data.user as User);
     }
     toast.success(res.data.message);
   };
@@ -75,6 +82,7 @@ const Auth = () => {
     );
     if (res.status === 201) {
       nav("/profile");
+      setUser(res.data.user as User);
     }
     toast.success(res.data.message);
   };
@@ -164,5 +172,3 @@ const Auth = () => {
 };
 
 export default Auth;
-
-// 1 44 06
