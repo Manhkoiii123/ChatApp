@@ -1,3 +1,6 @@
+import ChatContainer from "@/pages/chat/components/chat-container";
+import ContactsContainer from "@/pages/chat/components/contacts-container";
+import EmptyChatContainer from "@/pages/chat/components/empty-chat-container";
 import { createUserState, useAuthZustand } from "@/store/slices/authSlice";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -12,7 +15,13 @@ const Chat = () => {
       nav("/profile");
     }
   }, [nav, user]);
-  return <div>Chat</div>;
+  return (
+    <div className="flex h-screen text-white overflow-hidden ">
+      <ContactsContainer />
+      {/* <EmptyChatContainer /> */}
+      <ChatContainer />
+    </div>
+  );
 };
 
 export default Chat;
