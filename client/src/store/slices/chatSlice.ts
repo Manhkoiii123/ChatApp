@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { create } from "zustand";
 export type Contact = {
   color: number;
@@ -12,16 +13,17 @@ export type Contact = {
 export type createContactState = {
   selectedChatType: string | undefined;
   selectedChatData: Contact | undefined;
-  selectedChatMessages: [] | undefined;
+  selectedChatMessages: any;
   setSelectedChatType: (type: string) => void;
   setSelectedChatData: (data: Contact) => void;
   closeChat: () => void;
   setSelectedChatMessages: (messages: []) => void;
+  addMessage: (message: any) => void;
 };
-export const useChatZustand = create<createContactState>((set) => ({
+export const useChatZustand = create<createContactState>((set, get) => ({
   selectedChatType: undefined,
   selectedChatData: undefined,
-  selectedChatMessages: undefined,
+  selectedChatMessages: [],
   setSelectedChatType: (type: string) => set({ selectedChatType: type }),
   setSelectedChatData: (data: Contact) => set({ selectedChatData: data }),
   closeChat: () =>
@@ -30,6 +32,26 @@ export const useChatZustand = create<createContactState>((set) => ({
       selectedChatData: undefined,
       selectedChatMessages: [],
     }),
-  setSelectedChatMessages: (messages: []) =>
-    set({ selectedChatMessages: messages }),
+  setSelectedChatMessages: (selectedChatMessages) =>
+    set({ selectedChatMessages }),
+  addMessage: (message: any) => {
+    const selectedChatMessages = get().selectedChatMessages;
+    const selectedChatType = get().selectedChatType;
+    set({
+      selectedChatMessages: [
+        ...selectedChatMessages,
+        {
+          ...message,
+          recipient:
+            selectedChatType === "channel"
+              ? message.recipient
+              : message.recipient._id,
+          sender:
+            selectedChatType === "channel"
+              ? message.sender
+              : message.sender._id,
+        },
+      ],
+    });
+  },
 }));
