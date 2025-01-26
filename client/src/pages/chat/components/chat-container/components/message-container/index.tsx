@@ -3,10 +3,41 @@
 import { useChatZustand } from "@/store/slices/chatSlice";
 import { useEffect, useRef } from "react";
 import moment from "moment";
+import { apiClient } from "@/lib/api-client";
+import { GET_MESSAGES_ROUTE } from "@/utils/constants";
 const MessageContainer = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { selectedChatData, selectedChatType, selectedChatMessages } =
-    useChatZustand((state) => state);
+  const {
+    selectedChatData,
+    selectedChatType,
+    selectedChatMessages,
+    setSelectedChatMessages,
+  } = useChatZustand((state) => state);
+  useEffect(() => {
+    const getMessages = async () => {
+      try {
+        const response = await apiClient.post(
+          GET_MESSAGES_ROUTE,
+          {
+            id: selectedChatData?._id,
+          },
+          {
+            withCredentials: true,
+          }
+        );
+        if (response.status === 200 && response.data.messages) {
+          setSelectedChatMessages(response.data.messages);
+        }
+      } catch (error: any) {
+        console.log("🚀 ~ getMessages ~ error", error);
+      }
+    };
+    if (selectedChatData?._id) {
+      if (selectedChatType === "contact") {
+        getMessages();
+      }
+    }
+  }, [selectedChatData, selectedChatType, setSelectedChatMessages]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -16,14 +47,14 @@ const MessageContainer = () => {
   const renderMessage = () => {
     let lastDate: any = null;
     return (selectedChatMessages || []).map((message: any, index: number) => {
-      const messageDate = moment(message.createdAt).format("YYYY-MM-DD");
+      const messageDate = moment(message.timestamps).format("YYYY-MM-DD");
       const showDate = messageDate !== lastDate;
       lastDate = messageDate;
       return (
         <div key={index}>
           {showDate && (
             <div className="text-center text-gray-500 my-2">
-              {moment(message.timestamp).format("LL")}
+              {moment(message.timestamps).format("LL")}
             </div>
           )}
           {selectedChatType === "contact" && renderDMMessage(message)}
@@ -54,7 +85,7 @@ const MessageContainer = () => {
           <></>
         )}
         <div className="text-xs text-gray-500">
-          {moment(message.timestamp).format("LT")}
+          {moment(message.timestamps).format("LT")}
         </div>
       </div>
     );
