@@ -19,6 +19,8 @@ export type createContactState = {
   closeChat: () => void;
   setSelectedChatMessages: (messages: []) => void;
   addMessage: (message: any) => void;
+  directMessagesContacts: [];
+  setDirectMessagesContacts: (contacts: []) => void;
 };
 export const useChatZustand = create<createContactState>((set, get) => ({
   selectedChatType: undefined,
@@ -54,4 +56,7 @@ export const useChatZustand = create<createContactState>((set, get) => ({
       ],
     });
   },
+  directMessagesContacts: [],
+  setDirectMessagesContacts: (contacts) =>
+    set({ directMessagesContacts: contacts }),
 }));
